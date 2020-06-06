@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/card_view"
+    style="@style/SelectableItemBackground"
+    android:layout_width="fill_parent"
+    android:layout_height="70dp"
+    android:layout_margin="5dp"
+    android:backgroundTintMode="screen"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackgroundBorderless"
+    card_view:cardBackgroundColor="@color/colorError"
+    card_view:cardCornerRadius="5dp"
+    card_view:cardMaxElevation="25dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/card_view_css"
+
+        >
+
+        <ImageView
+            android:id="@+id/imageview"
+            android:layout_width="70dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="7.5dp"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/Apk_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/imageview"
+            android:textColor="#FF6E40"
+
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/Apk_Package_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Apk_Name"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="6dp"
+            android:layout_toEndOf="@id/imageview"
+            android:textColor="#F8997A"
+            android:textSize="10sp" />
+
+        <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/timeFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="#CE010825"
+            android:backgroundTint="#CE010825"
+            android:backgroundTintMode="src_in"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:tint="@color/colorPrimary"
+            card_view:backgroundTint="#CE010825"
+            card_view:fabSize="normal"
+            card_view:rippleColor="#BF360C"
+            card_view:srcCompat="@drawable/ic_add_alarm_black_24dp" />-->
+
+        <ImageButton
+            android:id="@+id/timeFAB"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="12dp"
+            android:background="@color/colorError"
+            android:backgroundTint="@color/colorError"
+            android:backgroundTintMode="src_in"
+            android:clickable="true"
+            android:elevation="0dp"
+            android:scaleType="centerInside"
+            android:tint="@color/colorPrimary"
+            card_view:backgroundTint="@color/colorError"
+            card_view:rippleColor="#F35A2E"
+            card_view:srcCompat="@drawable/ic_add_alarm_black_24dp" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

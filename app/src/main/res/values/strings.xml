@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">TimeUp</string>
+    <string name="tab_text_1">Progress</string>
+    <string name="tab_text_2">Home</string>
+    <string name="tab_text_3">Stats</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tv_daily_hours_max">Maximum Hours Daily:</string>
+    <string name="title_activity_add_to_do_item">Add Item</string>
+    <string name="hours">hours</string>
+    <string name="timeup_monitor">TimeUp App Monitor</string>
+    <string name="timeup_m_serv">Monitor Service</string>
+</resources>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/usage_card_view"
+    style="@style/SelectableItemBackground"
+    android:layout_width="fill_parent"
+    android:layout_height="100dp"
+    android:layout_margin="5dp"
+    android:animateLayoutChanges="true"
+    android:backgroundTintMode="screen"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackgroundBorderless"
+    card_view:cardBackgroundColor="@color/colorError"
+    card_view:cardCornerRadius="5dp"
+    card_view:cardMaxElevation="25dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/card_view_css"
+
+        >
+
+        <ImageView
+            android:id="@+id/usageImageview"
+            android:layout_width="70dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="7.5dp"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/usageApk_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/usageImageview"
+            android:textColor="#FF6E40"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/usageApk_Package_Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/usageApk_Name"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="6dp"
+            android:layout_toEndOf="@id/usageImageview"
+            android:textColor="#F8997A"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/percentIndicator"
+            android:layout_width="90dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="12dp"
+            android:background="@color/colorError"
+            android:backgroundTint="@color/colorError"
+            android:elevation="24dp"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/colorPrimary"
+            android:textSize="36sp"
+            android:tint="@color/colorPrimary"
+            card_view:backgroundTint="@color/colorError" />
+
+        <TextView
+            android:id="@+id/total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="7dp"
+            android:textAlignment="center"
+            android:textColor="@color/colorCardView"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/used"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="7dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

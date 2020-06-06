@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FF5722</color>
+    <color name="colorPrimaryDark">#0D0E18</color>
+    <color name="colorAccent">#FF5722</color>
+    <color name="list_divider">#E0F3DDD2</color>
+    <color name="colorCardView">#FF6E40</color>
+    <color name="colorDialog">#1D2144</color>
+    <color name="colorPrimaryLight">#18ffff</color>
+    <color name="colorPrimaryLightDark">#26a69a</color>
+    <color name="colorAccentLight">#ffe0b2</color>
+    <color name="colorError">#CE010825</color>
+    <color name="colorErrorDark">#1DE9B6</color>
+</resources>
