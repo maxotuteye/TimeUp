@@ -214,13 +214,14 @@ public class MonitorService extends Service {
     private void vibrate() {
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         int millis = 2000;
+        long[] pattern = {0, 500, 250, 250, 250, 1000};
         // Vibrate for milliseconds
+        assert v != null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            assert v != null;
-            v.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE));
+//            v.vibrate(VibrationEffect.createOneShot(millis, VibrationEffect.DEFAULT_AMPLITUDE));
+            v.vibrate(VibrationEffect.createWaveform(pattern, -1));
         } else {
-            assert v != null;
-            v.vibrate(millis);
+            v.vibrate(pattern, -1);
         }
     }
 
@@ -236,7 +237,7 @@ public class MonitorService extends Service {
             if (currentTimes.keySet().contains(Time) &&
                     isTimeUp(Float.valueOf(String.valueOf(maxTimes.get(Time))), currentTimes.get(Time))
                     && getForegroundTask().equals(Time)) {
-                Log.i("KILL", "App is " + Time + "overtime:" +
+                Log.i("KILL", "App is " + Time + ", overtime: " +
                         (currentTimes.get(Time) - Float.valueOf(String.valueOf(maxTimes.get(Time)))));
                 kill(Time);
             }

@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements UsageFragment.OnL
         appLabels = new ArrayList<>();
         appIcons = new ArrayList<>();
         getAppData();
-       // startOrStopService("true");
+        startOrStopService("false");
         themeSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

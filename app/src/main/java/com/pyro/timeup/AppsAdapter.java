@@ -110,8 +110,8 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
                 final AlertDialog.Builder dialog = new AlertDialog.Builder(context1);
                 dialog.setTitle(ApplicationLabelName);
                 dialog.setMessage("Enter maximum daily hours for " + ApplicationLabelName);
-                final EditText input = new EditText(context1);
-                input.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                EditText input = new EditText(context1);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT);
@@ -124,7 +124,7 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
                         //Store value as a shared pref
                         try {
                             Double noBusinessHere = Double.parseDouble(input.getText().toString().trim());
-                            if (noBusinessHere > 24.0){
+                            if (noBusinessHere > 24.0) {
                                 throw new Exception();
                             } else {
                                 preferences = context1.getSharedPreferences(HOURS, Context.MODE_PRIVATE);
@@ -136,13 +136,11 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
                                 checkForPermission(context1);
                                 try {
                                     startOrStopService("false");
-                                }
-                                catch (Exception eee){
+                                } catch (Exception eee) {
                                     Log.i("KILL", Objects.requireNonNull(eee.getMessage()));
                                 }
                             }
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             Toast.makeText(context1, "Invalid input!", Toast.LENGTH_LONG).show();
                             e.printStackTrace();
                         }
@@ -195,25 +193,11 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
                 startOrStopService("true");
             }
         };
-        if (!isMyServiceRunning(MonitorService.class)) {
-            Log.i("KILL", "Start Service");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context1.startService(serviceIntent);
-               // context1.bindService(serviceIntent, monitorConnection, Context.BIND_EXTERNAL_SERVICE);
-            } else {
-                context1.startService(serviceIntent);
-            }
-        } else {
+        if (isMyServiceRunning(MonitorService.class)) {
             Log.i("KILL", "Stop Service");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context1.stopService(serviceIntent);
-               // context1.unbindService(monitorConnection);
-               // context1.startService(serviceIntent);
-              //  context1.bindService(serviceIntent, monitorConnection, Context.BIND_EXTERNAL_SERVICE);
-            } else {
-                context1.stopService(serviceIntent);
-              //  context1.startService(serviceIntent);
-            }
+            context1.stopService(serviceIntent);
         }
+        Log.i("KILL", "Start Service");
+        context1.startService(serviceIntent);
     }
 }
