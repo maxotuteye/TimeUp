@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements UsageFragment.OnL
         appLabels = new ArrayList<>();
         appIcons = new ArrayList<>();
         getAppData();
-        startOrStopService();
+       // startOrStopService("true");
         themeSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,10 +90,11 @@ public class MainActivity extends AppCompatActivity implements UsageFragment.OnL
         return false;
     }
 
-    private void startOrStopService() {
+    private void startOrStopService(String stop) {
         Intent serviceIntent;
         Context context1 = getApplicationContext();
         serviceIntent = new Intent(context1.getApplicationContext(), MonitorService.class);
+        serviceIntent.putExtra("stop", stop);
         serviceIntent.setAction("com.pyro.timeup.MonitorService");
         ServiceConnection monitorConnection = new ServiceConnection() {
             @Override
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements UsageFragment.OnL
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                startOrStopService();
+                startOrStopService("true");
             }
         };
         if (!isMyServiceRunning(MonitorService.class)) {

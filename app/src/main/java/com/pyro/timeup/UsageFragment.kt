@@ -176,7 +176,7 @@ class UsageFragment : Fragment() {
         appIcons = ArrayList()
         extractor = ApkInfoExtractor(context)
         apkInfoList = extractor!!.allInstalledApkInfo
-        preferences = context!!.getSharedPreferences(getString(R.string.hours), Context.MODE_PRIVATE)
+        preferences = context!!.getSharedPreferences(getString(R.string.hours), Context.MODE_MULTI_PROCESS)
         timedApps = preferences!!.all as HashMap<String, Long>
         getAppData()
         for (apk in apkInfoList) {

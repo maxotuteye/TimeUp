@@ -7,6 +7,7 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.SharedPreferences
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +17,18 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 
 
-internal class UsageAdapter(private val context1: Context, private var stringList: List<String>) : RecyclerView.Adapter<UsageAdapter.ViewHolder>() {
+internal class UsageAdapter(private val context1: Context, private var stringList: List<String>) :
+    RecyclerView.Adapter<UsageAdapter.ViewHolder>() {
     private val HOURS = "hours"
-    private var preferences: SharedPreferences = context1.getSharedPreferences(HOURS, Context.MODE_PRIVATE)
-    private val usageStatsManager: UsageStatsManager = context1.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-    private val usageStatsList: MutableList<UsageStats> = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, 0, System.currentTimeMillis())
+    private var preferences: SharedPreferences =
+        context1.getSharedPreferences(HOURS, Context.MODE_PRIVATE)
+    private val usageStatsManager: UsageStatsManager =
+        context1.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+    private val usageStatsList: MutableList<UsageStats> = usageStatsManager.queryUsageStats(
+        UsageStatsManager.INTERVAL_DAILY,
+        0,
+        System.currentTimeMillis()
+    )
     private var usedApps: HashMap<String, Long> = HashMap()
     private var timedApps: HashMap<String, Float> = preferences.all as HashMap<String, Float>
     private var timeSum: Long = 0
@@ -66,6 +74,7 @@ internal class UsageAdapter(private val context1: Context, private var stringLis
                 preferences.edit().remove(applicationPackageName).apply()
                 viewHolder.cardView.visibility = View.INVISIBLE
                 notifyDataSetChanged()
+                Log.i("KILL", "Updated preferences: ${preferences.all.toString()}")
                 return@OnClickListener
             }).setNegativeButton("CANCEL", DialogInterface.OnClickListener { _, _ ->
                 //not removing items if cancel is selected
@@ -82,11 +91,12 @@ internal class UsageAdapter(private val context1: Context, private var stringLis
     private fun getUsagePercent(sample: String): String {
         val used = usedApps[sample]
         val timed = timedApps[sample]
-        return if (used == null || timed == null)   "0%"
-            else  (used.toFloat() / timed.toFloat() * 100).toInt().toString() + "%"
+        return if (used == null || timed == null) "0%"
+        else (used.toFloat() / timed.toFloat() * 100).toInt().toString() + "%"
 
     }
-    private fun formatTime(l: Long?): String{
+
+    private fun formatTime(l: Long?): String {
         if (l == null) return "Not Used"
         val minutes = (l / (1000 * 60) % 60).toInt()
         val seconds = (l / 1000).toInt() % 60

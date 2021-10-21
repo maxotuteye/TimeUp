@@ -17,14 +17,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,6 +39,7 @@ public class MonitorService extends Service {
 
     public static final int INTERVAL = 5000;
     private Handler handler = new Handler();
+    public Runnable runnable;
     private Timer timer = null;
     public String app;
     public UsageStatsManager usageStatsManager;
@@ -46,7 +51,6 @@ public class MonitorService extends Service {
     Map<String, ?> apps;
     ApkInfoExtractor extractor;
     SharedPreferences preferences;
-    //TEST: use a sample app to test if it actually works
 
     public MonitorService() {
         super();
@@ -54,6 +58,38 @@ public class MonitorService extends Service {
 
     @Override
     public void onCreate() {
+/*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channel_id = "timeup_channel";
+            NotificationChannel channel = new NotificationChannel(channel_id,
+                    "Timer Service",
+                    NotificationManager.IMPORTANCE_LOW);
+
+            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+            Notification notification = new NotificationCompat.Builder(this, channel_id)
+                    .setContentTitle(getString(R.string.timeup_monitor))
+                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                    .setContentText(getString(R.string.timeup_m_serv)).build();
+
+            startForeground(19777, notification);
+        }
+        preferences = null;
+        extractor = new ApkInfoExtractor(getApplicationContext());
+        start = 0;
+        if (timer != null) {
+            timer.cancel();
+        } else timer = new Timer();
+        timer.scheduleAtFixedRate(new TimeDisplay(), 0, INTERVAL);*/
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (Objects.equals(intent.getStringExtra("stop"), "true")) {
+            Log.i("KILL", "Monitor is being stopped");
+            onDestroy();
+        }
+        Log.i("KILL", "Monitor allowed to start");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channel_id = "timeup_channel";
             NotificationChannel channel = new NotificationChannel(channel_id, "Timer Service", NotificationManager.IMPORTANCE_LOW);
@@ -61,7 +97,7 @@ public class MonitorService extends Service {
             ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(channel);
             Notification notification = new NotificationCompat.Builder(this, channel_id)
                     .setContentTitle(getString(R.string.timeup_monitor))
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
                     .setContentText(getString(R.string.timeup_m_serv)).build();
 
             startForeground(19777, notification);
@@ -73,28 +109,22 @@ public class MonitorService extends Service {
             timer.cancel();
         } else timer = new Timer();
         timer.scheduleAtFixedRate(new TimeDisplay(), 0, INTERVAL);
-    }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String channel_id = "timeup_channel";
-            NotificationChannel channel = new NotificationChannel(channel_id, "Timer Service", NotificationManager.IMPORTANCE_LOW);
-
-            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-            Notification notification = new NotificationCompat.Builder(this, channel_id)
-                    .setContentTitle(getString(R.string.timeup_monitor))
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentText(getString(R.string.timeup_m_serv)).build();
-
-            startForeground(19777, notification);
-        }
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
+        Log.i("KILL", "Destroying Service");
+        preferences = null;
+        timer.cancel();
+        timer = null;
+        handler.removeCallbacks(runnable);
+        handler = null;
+        stopForeground(true);
+        stopSelf();
         super.onDestroy();
+        Log.i("KILL", "Destroyed Service");
     }
 
     @Nullable
@@ -104,39 +134,42 @@ public class MonitorService extends Service {
     }
 
     public class TimeDisplay extends TimerTask {
+
         @Override
         public void run() {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    preferences = null;
-                    apps = getTimedApps();
-                    timeMap = new HashMap<>();
-                    end = System.currentTimeMillis();
-                    usageStatsManager = (UsageStatsManager) getApplicationContext().getSystemService(USAGE_STATS_SERVICE);
-                    assert usageStatsManager != null;
-                    usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end);
-                    if (usageStatsList != null) {
-                        for (UsageStats usageStats : usageStatsList) {
-                            timeInForeground = (float) usageStats.getTotalTimeInForeground();
-                            packageName = usageStats.getPackageName();
-                            timeMap.put(packageName, timeInForeground);
+            runnable = () -> {
+                preferences = null;
+                apps = getTimedApps();
+                timeMap = new HashMap<>();
+                end = System.currentTimeMillis();
+                usageStatsManager = (UsageStatsManager) getApplicationContext().getSystemService(USAGE_STATS_SERVICE);
+                assert usageStatsManager != null;
+                usageStatsList = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end);
+                if (usageStatsList != null) {
+                    for (UsageStats usageStats : usageStatsList) {
+                        timeInForeground = (float) usageStats.getTotalTimeInForeground();
+                        packageName = usageStats.getPackageName();
+                        timeMap.put(packageName, timeInForeground);
 
-                            if (getForegroundTask().equals(packageName)) {
-                                if (timeMap.get(packageName) != null) {
-                                    float c = timeMap.get(packageName);
-                                    timeMap.put(packageName, c + Time(usageStats.getLastTimeUsed()));
-                                } else timeMap.put(packageName, timeInForeground);
-                            } else {
-                                timeMap.remove(packageName);
-                                timeMap.put(packageName, timeInForeground);
-                            }
+                        if (getForegroundTask().equals(packageName)) {
+                            if (timeMap.get(packageName) != null) {
+                                float c = timeMap.get(packageName);
+                                timeMap.put(packageName, c + Time(usageStats.getLastTimeUsed()));
+                            } else timeMap.put(packageName, timeInForeground);
+                        } else {
+                            timeMap.remove(packageName);
+                            timeMap.put(packageName, timeInForeground);
                         }
-                        apps = getTimedApps();
-                        Control(apps, timeMap);
                     }
+                    apps = getTimedApps();
+                    Control(apps, timeMap);
                 }
-            });
+            };
+
+//            handler.post(() -> {
+//
+//            });
+            handler.post(runnable);
         }
     }
 
@@ -145,7 +178,8 @@ public class MonitorService extends Service {
     }
 
     Map<String, ?> getTimedApps() {
-        preferences = getSharedPreferences("hours", MODE_PRIVATE);
+        preferences = getSharedPreferences("hours", MODE_MULTI_PROCESS);
+        Log.i("KILL", "getTimedApps: " + preferences.getAll().toString());
         if (preferences.getAll().isEmpty())
             onDestroy();
         return preferences.getAll();
@@ -153,6 +187,7 @@ public class MonitorService extends Service {
 
     private void kill(String time) {
         time = extractor.getAppName(time);
+        Log.i("KILL", "Running kill on " + time);
         Toast notice = Toast.makeText(getApplicationContext(), time + "'s time is up\nPlease exit the app", Toast.LENGTH_SHORT);
         notice.setGravity(Gravity.CENTER, 0, 0);
         notice.show();
@@ -201,6 +236,8 @@ public class MonitorService extends Service {
             if (currentTimes.keySet().contains(Time) &&
                     isTimeUp(Float.valueOf(String.valueOf(maxTimes.get(Time))), currentTimes.get(Time))
                     && getForegroundTask().equals(Time)) {
+                Log.i("KILL", "App is " + Time + "overtime:" +
+                        (currentTimes.get(Time) - Float.valueOf(String.valueOf(maxTimes.get(Time)))));
                 kill(Time);
             }
         }

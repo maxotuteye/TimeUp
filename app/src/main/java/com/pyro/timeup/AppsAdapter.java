@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Process;
 import android.provider.Settings;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
+import java.util.Objects;
 
 class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
     private Context context1;
@@ -88,7 +90,7 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
         viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                preferences = context1.getSharedPreferences(HOURS, Context.MODE_PRIVATE);
+                preferences = context1.getSharedPreferences(HOURS, Context.MODE_MULTI_PROCESS);
                 float l = preferences.getFloat(ApplicationPackageName, -1);
                 if (l < 0) {
                     Toast.makeText(context1, ApplicationLabelName + "'s max hours : Not assigned", Toast.LENGTH_SHORT).show();
@@ -132,7 +134,12 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
                                 editor.apply();
                                 Snackbar.make(view, "Maximum Hours set!", Snackbar.LENGTH_LONG).show();
                                 checkForPermission(context1);
-                                startOrStopService();
+                                try {
+                                    startOrStopService("false");
+                                }
+                                catch (Exception eee){
+                                    Log.i("KILL", Objects.requireNonNull(eee.getMessage()));
+                                }
                             }
                         }
                         catch (Exception e) {
@@ -173,9 +180,11 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
         return stringList.size();
     }
 
-    private void startOrStopService() {
+    private void startOrStopService(String stop) {
+        Log.i("KILL", "startOrStopService called");
         serviceIntent = new Intent(context1.getApplicationContext(), MonitorService.class);
         serviceIntent.setAction("com.pyro.timeup.MonitorService");
+        serviceIntent.putExtra("stop", stop);
         ServiceConnection monitorConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -183,22 +192,27 @@ class AppsAdapter extends RecyclerView.Adapter<AppsAdapter.ViewHolder> {
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
+                startOrStopService("true");
             }
         };
         if (!isMyServiceRunning(MonitorService.class)) {
+            Log.i("KILL", "Start Service");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context1.startService(serviceIntent);
-                context1.bindService(serviceIntent, monitorConnection, Context.BIND_EXTERNAL_SERVICE);
+               // context1.bindService(serviceIntent, monitorConnection, Context.BIND_EXTERNAL_SERVICE);
             } else {
                 context1.startService(serviceIntent);
             }
         } else {
+            Log.i("KILL", "Stop Service");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context1.unbindService(monitorConnection);
-                context1.bindService(serviceIntent, monitorConnection, Context.BIND_EXTERNAL_SERVICE);
+                context1.stopService(serviceIntent);
+               // context1.unbindService(monitorConnection);
+               // context1.startService(serviceIntent);
+              //  context1.bindService(serviceIntent, monitorConnection, Context.BIND_EXTERNAL_SERVICE);
             } else {
                 context1.stopService(serviceIntent);
-                context1.startService(serviceIntent);
+              //  context1.startService(serviceIntent);
             }
         }
     }
