@@ -26,7 +26,7 @@ import com.pyro.timeup.ui.main.SectionsPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements UsageFragment.OnListFragmentInteractionListener, AppListFragment.OnListFragmentInteractionListener, FragmentToDo.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements UsageFragment.OnListFragmentInteractionListener, AppListFragment.OnListFragmentInteractionListener {
 
     final ApkInfoExtractor extractor = new ApkInfoExtractor(this);
     List<String> apkInfoList;
